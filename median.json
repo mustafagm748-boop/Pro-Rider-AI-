@@ -1,0 +1,16 @@
+{
+  "initialUrl": "https://remix-pro-rider-ai-744956552026.us-west1.run.app",
+  "appName": "Remax Pro Rider AI",
+  "permissions": {
+    "camera": true,
+    "microphone": true,
+    "location": true,
+    "recordAudio": true,
+    "accessFineLocation": true,
+    "accessCoarseLocation": true,
+    "RECORD_AUDIO": true,
+    "ACCESS_FINE_LOCATION": true,
+    "ACCESS_COARSE_LOCATION": true,
+    "CAMERA": true
+  }
+}

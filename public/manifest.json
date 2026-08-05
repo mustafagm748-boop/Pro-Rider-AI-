@@ -1,0 +1,49 @@
+{
+  "short_name": "Pro Rider",
+  "name": "Remax Pro Rider AI",
+  "description": "Pro Rider App - Premium Ride Hailing, Carpooling & Express Dispatch Platform",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#FACC15",
+  "categories": ["travel", "navigation", "business"],
+  "icons": [
+    {
+      "src": "/logo_192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo_512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo_maskable.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/logo_512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Pro Rider Mobile App & Ride Booking"
+    },
+    {
+      "src": "/logo_512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Pro Rider Desktop & Admin Dispatch System"
+    }
+  ]
+}

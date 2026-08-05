@@ -1,0 +1,321 @@
+        </div>
+
+      </div>
+
+      {/* ---------------------------------------------------- */}
+      {/* 1. BOOK NOW SLIDE-UP FORM OVERLAY */}
+      {/* ---------------------------------------------------- */}
+      <AnimatePresence>
+        {activeOverlay === 'book' && (
+          <motion.div
+            initial={{ opacity: 0, y: '100%' }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: '100%' }}
+            className="absolute inset-x-0 bottom-0 top-16 bg-white z-[80] rounded-t-[3.5rem] shadow-[0_-10px_30px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden text-gray-900 border-t-4 border-yellow-400"
+          >
+            {/* Overlay Header */}
+            <div className="px-8 pt-6 pb-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between shrink-0">
+              <div>
+                <h3 className="text-lg font-black uppercase text-black">
+                  {isUrdu ? 'سواری بک کریں' : 'Book Premium Ride'}
+                </h3>
+                <p className="text-[9px] text-yellow-600 font-bold uppercase tracking-widest">
+                  {isUrdu ? 'فاصلہ اور پریمیم گاڑی منتخب کریں' : 'Calculate accurate cash system fares'}
+                </p>
+              </div>
+              <button 
+                onClick={() => {
+                  setActiveOverlay('none');
+                  setBookingStatus('form');
+                }} 
+                className="p-2 bg-gray-200 rounded-full text-black hover:bg-gray-300 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* State 1: Form Filling */}
+            {bookingStatus === 'form' && (
+              <>
+                {/* Overlay Form Scroll */}
+                <div className="flex-1 overflow-y-auto p-8 space-y-5 custom-scrollbar">
+                  
+                  {/* Pickup location */}
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-black uppercase tracking-wider text-gray-400">
+                      {isUrdu ? 'جہاں سے سوار ہونا ہے (پک اپ کا پتہ)' : 'Pickup Location'}
+                    </label>
+                    <div className="relative">
+                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-600 animate-pulse" />
+                      <input 
+                        type="text"
+                        value={pickup}
+                        onChange={(e) => setPickup(e.target.value)}
+                        className="w-full pl-12 pr-6 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-2xl text-xs font-bold focus:border-yellow-400 outline-none text-black"
+                        placeholder={isUrdu ? 'پک اپ کا پتہ درج کریں...' : 'Enter pickup address...'}
+                      />
+                    </div>
+                    {/* 3 Quick Options for Pickup */}
+                    <div className="flex gap-1.5 mt-1 overflow-x-auto py-1 shrink-0 no-scrollbar">
+                      {[
+                        { label: isUrdu ? '📍 میری پن لوکیشن' : '📍 My GPS Pin', val: 'GPS Pin: (33.6844, 73.0479)' },
+                        { label: isUrdu ? '📍 فیض آباد مرکز' : '📍 Faizabad Hub', val: 'Faizabad Interchange Center' },
+                        { label: isUrdu ? '📍 سینٹورس مال' : '📍 Centaurus Mall', val: 'Centaurus Mall, Sector F-8' },
+                      ].map((opt, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => {
+                            setPickup(opt.val);
+                            speakAnnouncement(`Pickup set to ${opt.label}`, `پک اپ پوائنٹ تبدیل کر دیا گیا ہے`);
+                          }}
+                          className={`px-3 py-1.5 rounded-full text-[9px] font-bold border whitespace-nowrap transition-all ${pickup === opt.val ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Destination */}
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-black uppercase tracking-wider text-gray-400">
+                      {isUrdu ? 'جہاں جانا ہے (منزل)' : 'Destination Location'}
+                    </label>
+                    <div className="relative">
+                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-red-600 animate-bounce" />
+                      <input 
+                        type="text"
+                        value={destination}
+                        onChange={(e) => setDestination(e.target.value)}
+                        className="w-full pl-12 pr-6 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-2xl text-xs font-bold focus:border-yellow-400 outline-none text-black"
+                        placeholder={isUrdu ? 'اپنی منزل کا پتہ درج کریں...' : 'Where to go? (e.g., Centaurus Mall)'}
+                      />
+                    </div>
+                    {/* 3 Quick Options for Destination */}
+                    <div className="flex gap-1.5 mt-1 overflow-x-auto py-1 shrink-0 no-scrollbar">
+                      {[
+                        { label: isUrdu ? '📍 سری نگر ہائی وے' : '📍 Srinagar Hwy', val: 'Srinagar Highway Toll Plaza' },
+                        { label: isUrdu ? '📍 جی الیون جوڈیشل' : '📍 Judicial Complex', val: 'G-11 Judicial Complex' },
+                        { label: isUrdu ? '📍 اسلام آباد ائیرپورٹ' : '📍 ISB Airport', val: 'Islamabad International Airport (ISB)' },
+                      ].map((opt, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => {
+                            setDestination(opt.val);
+                            speakAnnouncement(`Destination set to ${opt.label}`, `منزل کا پتہ تبدیل کر دیا گیا ہے`);
+                          }}
+                          className={`px-3 py-1.5 rounded-full text-[9px] font-bold border whitespace-nowrap transition-all ${destination === opt.val ? 'bg-red-600 text-white border-red-600' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Distance input */}
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-black uppercase tracking-wider text-gray-400">
+                      {isUrdu ? 'فاصلہ کلومیٹر میں (اندازاً)' : 'Estimated Distance (km)'}
+                    </label>
+                    <input 
+                      type="number"
+                      step="0.1"
+                      value={distance}
+                      onChange={(e) => setDistance(e.target.value)}
+                      className="w-full px-6 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-2xl text-xs font-bold focus:border-yellow-400 outline-none text-black"
+                      placeholder={isUrdu ? 'کلومیٹر میں فاصلہ لکھیں...' : 'Enter distance in kilometers...'}
+                    />
+                  </div>
+
+                  {/* Vehicle Type Selection */}
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-wider text-gray-400">
+                      {isUrdu ? 'سواری منتخب کریں' : 'Select Vehicle'}
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { id: 'bike', labelUr: 'بائیک', labelEn: 'Bike', pkr: '20/km' },
+                        { id: 'rickshaw', labelUr: 'رکشہ', labelEn: 'Rickshaw', pkr: '25/km' },
+                        { id: 'mini', labelUr: 'منی کار', labelEn: 'Mini', pkr: '40/km' },
+                        { id: 'ac-car', labelUr: 'اے سی کار', labelEn: 'AC Car', pkr: '55/km' },
+                        { id: 'premium', labelUr: 'پریمیم کار', labelEn: 'Premium', pkr: '100/km' }
+                      ].map(v => (
+                        <button
+                          key={v.id}
+                          onClick={() => setVehicle(v.id as VehicleType)}
+                          className={`p-2 rounded-xl text-center border-2 transition-all flex flex-col justify-center items-center ${
+                            vehicle === v.id ? 'border-black bg-black text-yellow-400 shadow-md' : 'border-gray-100 bg-gray-50 text-gray-500 hover:border-gray-200'
+                          }`}
+                        >
+                          <span className="text-[10px] font-black uppercase">
+                            {isUrdu ? v.labelUr : v.labelEn}
+                          </span>
+                          <span className="text-[7px] opacity-60 font-black mt-0.5">Rs.{v.pkr}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Service Context Selector */}
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-wider text-gray-400">
+                      {isUrdu ? 'سروس کی قسم' : 'Service Type'}
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { id: 'city', labelUr: 'شہر کے اندر سفر', labelEn: 'Within City' },
+                        { id: 'long-route', labelUr: 'طویل سفر (لانگ روٹ)', labelEn: 'Long Route' },
+                        { id: 'city-to-city', labelUr: 'دوسرے شہر کے لیے', labelEn: 'City To City' },
+                        { id: 'tourism', labelUr: 'سیاحت کے لیے سواری', labelEn: 'Tourism' }
+                      ].map(sc => (
+                        <button
+                          key={sc.id}
+                          onClick={() => setServiceContext(sc.id as ServiceType)}
+                          className={`p-2.5 rounded-xl text-[9px] font-black uppercase border-2 text-center transition-all ${
+                            serviceContext === sc.id ? 'border-black bg-black text-yellow-400' : 'border-gray-100 bg-gray-50 text-gray-500'
+                          }`}
+                        >
+                          {isUrdu ? sc.labelUr : sc.labelEn}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Payment Methods */}
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-wider text-gray-400">
+                      {isUrdu ? 'طریقہ ادائیگی منتخب کریں' : 'Payment Option'}
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => setPaymentMethod('cash')}
+                        className={`p-3 rounded-xl border-2 font-black text-[10px] uppercase transition-all ${paymentMethod === 'cash' ? 'border-green-600 bg-green-50 text-green-800' : 'border-gray-100 text-gray-400'}`}
+                      >
+                        {isUrdu ? '💵 نقد ادائیگی (کیش)' : '💵 Cash Payment'}
+                      </button>
+                      <button
+                        onClick={() => setPaymentMethod('wallet')}
+                        className={`p-3 rounded-xl border-2 font-black text-[10px] uppercase transition-all ${paymentMethod === 'wallet' ? 'border-yellow-500 bg-yellow-50 text-yellow-800' : 'border-gray-100 text-gray-400'}`}
+                      >
+                        {isUrdu ? `💳 والٹ (Rs. ${walletBalance})` : `💳 Wallet (Rs. ${walletBalance})`}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Safety verification note */}
+                  <div className="p-3.5 bg-yellow-50 rounded-xl border border-yellow-200 text-[10px] text-yellow-900 leading-relaxed font-bold">
+                    ⚠️ All drivers are checked. If you notice any security issues, please call Support at <strong>03125007782</strong> or alert Police 15 instantly.
+                  </div>
+
+                </div>
+
+                {/* Confirm button */}
+                <div className="p-6 bg-gray-50 border-t border-gray-100 shrink-0">
+                  <button
+                    onClick={handleConfirmBooking}
+                    className="w-full py-4 bg-black text-yellow-400 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-lg flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-95 transition-transform"
+                  >
+                    <Check className="w-4 h-4" /> {isUrdu ? 'بکنگ تلاش کریں' : 'Book Premium Dispatch Now'}
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* State 2: Radar Search Broadcast */}
+            {bookingStatus === 'searching' && (
+              <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-6 bg-neutral-950 text-white">
+                <div className="relative w-36 h-36">
+                  {/* Radar sweep animation */}
+                  <motion.div 
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+                    className="absolute inset-0 rounded-full border border-yellow-400/20"
+                    style={{ background: 'conic-gradient(from 0deg, rgba(234, 179, 8, 0.4) 0deg, transparent 90deg)' }}
+                  />
+                  <div className="absolute inset-2 rounded-full border border-white/10 flex items-center justify-center">
+                    <Navigation className="w-8 h-8 text-yellow-400 animate-pulse" />
+                  </div>
+                </div>
+
+                <div className="text-center space-y-2">
+                  <h4 className="text-lg font-black uppercase tracking-tight text-white">
+                    {isUrdu ? 'ڈرائیورز تلاش کیے جا رہے ہیں...' : 'BROADCASTING TO DRIVERS...'}
+                  </h4>
+                  <p className="text-[10px] text-gray-400 font-bold max-w-xs leading-relaxed">
+                    {isUrdu ? 'اے آئی کے ذریعے 6 کلومیٹر کے دائرے میں پریمیم ڈرائیورز کو سگنل بھیجا جا رہا ہے...' : 'AI matchmaking active. Signaling approved vehicles within 6-7 km radius...'}
+                  </p>
+                </div>
+
+                {/* Progress bar */}
+                <div className="w-full max-w-xs bg-white/10 rounded-full h-2.5 overflow-hidden border border-white/5">
+                  <motion.div 
+                    initial={{ width: '0%' }}
+                    animate={{ width: `${bookingSearchProgress}%` }}
+                    className="bg-yellow-400 h-full rounded-full"
+                  />
+                </div>
+
+                <div className="text-[9px] text-yellow-400 font-black uppercase tracking-widest animate-pulse text-center">
+                  {isUrdu ? 'محفوظ لنک قائم کیا جا رہا ہے (نمبرز پوشیدہ ہیں)' : 'SECURE VOIP TUNNEL DEPLOYED • NO CELLULAR SHARING'}
+                </div>
+              </div>
+            )}
+
+            {/* State 3: Driver Matched Screen */}
+            {bookingStatus === 'matched' && bookingMatchedDriver && (
+              <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-6 bg-neutral-900 text-white">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden border-4 border-yellow-400 shadow-2xl shrink-0">
+                  <img src={bookingMatchedDriver?.selfie || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300'} alt={bookingMatchedDriver?.name || 'Driver'} className="w-full h-full object-cover" />
+                </div>
+
+                <div className="text-center space-y-1">
+                  <span className="px-3 py-1 bg-green-500/10 text-green-400 text-[8px] font-black uppercase rounded-full border border-green-500/20 tracking-wider">
+                    🎉 Driver Accepted / سواری قبول کر لی گئی
+                  </span>
+                  <h4 className="text-xl font-black uppercase tracking-tight text-white mt-2">
+                    {bookingMatchedDriver?.name || 'Driver'}
+                  </h4>
+                  <p className="text-xs text-gray-300 font-bold">{bookingMatchedDriver?.vehicle || 'Premium Vehicle'}</p>
+                  <p className="text-[10px] text-yellow-400 font-black">⭐ {bookingMatchedDriver?.rating || 4.8} Rating • Near {bookingMatchedDriver?.distance || 'nearby'}</p>
+                </div>
+
+                {/* Secure network call notice */}
+                <div className="bg-white/5 rounded-2xl p-4 border border-white/10 text-center max-w-xs space-y-1">
+                  <p className="text-[10px] text-green-400 font-black uppercase tracking-widest">
+                    🔒 Secure Internet VoIP Line Active
+                  </p>
+                  <p className="text-[9px] text-gray-400 leading-normal font-medium">
+                    {isUrdu ? 'ڈرائیور کا ذاتی نمبر پوشیدہ ہے۔ آپ محفوظ انٹرنیٹ نیٹ ورک کے ذریعے رابطہ کر سکتے ہیں۔' : 'The driver cannot view your cellular phone number. Call is routed securely over encrypted voice.'}
+                  </p>
+                </div>
+
+                <div className="w-full max-w-xs space-y-2 pt-2">
+                  <button
+                    onClick={() => handleCallNearestDriver(bookingMatchedDriver)}
+                    className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black uppercase text-[10px] tracking-wider flex items-center justify-center gap-2 transition-transform active:scale-95 shadow"
+                  >
+                    <Phone className="w-4 h-4 fill-current" /> {isUrdu ? 'محفوظ نیٹ ورک کال کریں' : 'Secure Network Call'}
+                  </button>
+
+                  <button
+                    onClick={handleFinalizeBooking}
+                    className="w-full py-3.5 bg-yellow-400 hover:bg-yellow-500 text-black rounded-xl font-black uppercase text-[10px] tracking-wider flex items-center justify-center gap-2 transition-transform active:scale-95 shadow"
+                  >
+                    <Check className="w-4 h-4" /> {isUrdu ? 'سفر شروع کریں اور ٹریک کریں' : 'Confirm & Start Travel Tracking'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ---------------------------------------------------- */}
+      {/* 2. CARPOOLING & PACKAGES OVERLAY (SINGLE BUTTON ACTION) */}
+      {/* ---------------------------------------------------- */}
+      <AnimatePresence>
+        {activeOverlay === 'carpool_packages' && (
+          <motion.div

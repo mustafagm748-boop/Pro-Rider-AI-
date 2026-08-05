@@ -1,0 +1,13 @@
+{
+  "name": "Remax Pro Rider AI",
+  "description": "Smart AI-Powered Ride Hailing, Carpooling & Express Dispatch Platform for South Asia",
+  "initialUrl": "https://remix-pro-rider-ai-744956552026.us-west1.run.app",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

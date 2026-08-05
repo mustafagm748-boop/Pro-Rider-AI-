@@ -1,0 +1,143 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global Safety Net - default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Phase 3: Global Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'mustafagm748@gmail.com' ||
+        request.auth.token.admin == true ||
+        request.auth.token.role == 'admin' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Helper to check if a user is an approved driver
+    function isApprovedDriver(uid) {
+      let userDoc = get(/databases/$(database)/documents/users/$(uid));
+      return userDoc != null && userDoc.data.role == 'driver' && userDoc.data.status == 'approved';
+    }
+
+    // 2. Validation Blueprints (Anti-Update-Gap)
+    function isValidUser(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.name is string && data.name.size() >= 2 && data.name.size() <= 100 &&
+             (!('phone' in data) || (data.phone is string)) &&
+             data.role is string && (data.role == 'passenger' || data.role == 'driver' || data.role == 'admin') &&
+             (!('language' in data) || data.language is string) &&
+             (!('theme' in data) || data.theme is string) &&
+             data.createdAt is int &&
+             (!('googleUid' in data) || (data.googleUid is string)) &&
+             (!('status' in data) || (data.status is string));
+    }
+
+    function isValidStatus(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.userId is string && data.userId.size() <= 128 &&
+             data.userName is string && data.userName.size() >= 2 && data.userName.size() <= 50 &&
+             data.type is string && (data.type == 'text' || data.type == 'route' || data.type == 'video') &&
+             data.content is string && data.content.size() <= 500 &&
+             data.timestamp is int;
+    }
+
+    function isValidRide(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.passengerId is string && data.passengerId.size() <= 128 &&
+             (!('driverId' in data) || (data.driverId is string && data.driverId.size() <= 128)) &&
+             data.pickupLocation is string && data.pickupLocation.size() >= 2 && data.pickupLocation.size() <= 200 &&
+             data.dropoffLocation is string && data.dropoffLocation.size() >= 2 && data.dropoffLocation.size() <= 200 &&
+             data.status is string && (data.status == 'pending' || data.status == 'accepted' || data.status == 'ongoing' || data.status == 'completed' || data.status == 'cancelled') &&
+             data.fare is number &&
+             data.distance is string && data.distance.size() <= 20 &&
+             data.vehicleType is string && (data.vehicleType == 'bike' || data.vehicleType == 'rickshaw' || data.vehicleType == 'mini' || data.vehicleType == 'ac-car' || data.vehicleType == 'premium') &&
+             data.serviceType is string && (data.serviceType == 'city' || data.serviceType == 'long-route' || data.serviceType == 'city-to-city' || data.serviceType == 'tourism' || data.serviceType == 'sharing') &&
+             data.createdAt is int;
+    }
+
+    function isValidGroupConfig(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.membersCount is int &&
+             data.driversCount is int &&
+             data.passengersCount is int &&
+             data.broadcastStatus is string && data.broadcastStatus.size() <= 500 &&
+             (!('broadcastDriverId' in data) || (data.broadcastDriverId is string && data.broadcastDriverId.size() <= 128)) &&
+             (!('broadcastDriverName' in data) || (data.broadcastDriverName is string && data.broadcastDriverName.size() <= 50)) &&
+             (!('broadcastDriverSelfie' in data) || (data.broadcastDriverSelfie is string && data.broadcastDriverSelfie.size() <= 300)) &&
+             (!('broadcastDriverVehicleType' in data) || (data.broadcastDriverVehicleType is string && data.broadcastDriverVehicleType.size() <= 50)) &&
+             data.notice is string && data.notice.size() <= 500 &&
+             data.updatedAt is int;
+    }
+
+    // -------------------------------------------------------------
+    // TEST COLLECTION RULES
+    // -------------------------------------------------------------
+    match /test/{testId} {
+      allow read: if true;
+    }
+
+    // -------------------------------------------------------------
+    // USERS COLLECTION RULES
+    // -------------------------------------------------------------
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+    }
+
+    // -------------------------------------------------------------
+    // STATUSES COLLECTION RULES
+    // -------------------------------------------------------------
+    match /statuses/{statusId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+    }
+
+    // -------------------------------------------------------------
+    // RIDES COLLECTION RULES
+    // -------------------------------------------------------------
+    match /rides/{rideId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+    }
+
+    // -------------------------------------------------------------
+    // GROUP SETTINGS RULES
+    // -------------------------------------------------------------
+    match /groupSettings/{configId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+    }
+
+    // -------------------------------------------------------------
+    // CALLS COLLECTION RULES
+    // -------------------------------------------------------------
+    match /calls/{callId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+    }
+  }
+}

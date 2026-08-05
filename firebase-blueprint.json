@@ -1,0 +1,148 @@
+{
+  "entities": {
+    "user": {
+      "title": "User",
+      "description": "User profile containing identity, role, and configuration, with additional fields for registered pro drivers.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "phone": { "type": "string", "minLength": 7, "maxLength": 15 },
+        "name": { "type": "string", "minLength": 2, "maxLength": 50 },
+        "email": { "type": "string", "maxLength": 100 },
+        "selfieUrl": { "type": "string", "maxLength": 300 },
+        "country": { "type": "string", "maxLength": 50 },
+        "role": { "type": "string", "enum": ["passenger", "driver", "admin"] },
+        "language": { "type": "string", "enum": ["en", "ur", "de"] },
+        "theme": { "type": "string", "enum": ["light", "dark"] },
+        "createdAt": { "type": "integer" },
+        "walletBalance": { "type": "number" },
+        "securityCode": { "type": "string", "maxLength": 10 },
+        "fingerprintEnabled": { "type": "boolean" },
+        "idCardFrontUrl": { "type": "string", "maxLength": 300 },
+        "idCardBackUrl": { "type": "string", "maxLength": 300 },
+        "licenseFrontUrl": { "type": "string", "maxLength": 300 },
+        "licenseBackUrl": { "type": "string", "maxLength": 300 },
+        "vehicleFrontUrl": { "type": "string", "maxLength": 300 },
+        "vehicleBackUrl": { "type": "string", "maxLength": 300 },
+        "vehicleBookFrontUrl": { "type": "string", "maxLength": 300 },
+        "vehicleBookBackUrl": { "type": "string", "maxLength": 300 },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "acceptedRideId": { "type": "string", "maxLength": 128 },
+        "seats": { "type": "integer" },
+        "route": { "type": "string", "maxLength": 100 },
+        "vehicleType": { "type": "string", "enum": ["bike", "rickshaw", "mini", "ac-car", "premium"] },
+        "serviceType": { "type": "string", "enum": ["city", "long-route", "city-to-city", "tourism"] }
+      },
+      "required": ["id", "phone", "name", "role", "language", "theme", "createdAt", "walletBalance"]
+    },
+    "status": {
+      "title": "Status",
+      "description": "Short-lived broadcast statuses/stories shared by pro drivers or passengers.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userName": { "type": "string", "minLength": 2, "maxLength": 50 },
+        "type": { "type": "string", "enum": ["text", "route", "video"] },
+        "content": { "type": "string", "maxLength": 500 },
+        "timestamp": { "type": "integer" },
+        "metadata": { "type": "object" }
+      },
+      "required": ["id", "userId", "userName", "type", "content", "timestamp"]
+    },
+    "ride": {
+      "title": "Ride",
+      "description": "Ride booking details tracking the request lifecycle, pickup/dropoff points, fare, and associated passenger and driver.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "passengerId": { "type": "string", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "driverId": { "type": "string", "maxLength": 128 },
+        "pickupLocation": { "type": "string", "minLength": 2, "maxLength": 200 },
+        "dropoffLocation": { "type": "string", "minLength": 2, "maxLength": 200 },
+        "pickupCoords": { "type": "object" },
+        "dropoffCoords": { "type": "object" },
+        "status": { "type": "string", "enum": ["pending", "accepted", "ongoing", "completed", "cancelled"] },
+        "fare": { "type": "number" },
+        "distance": { "type": "string", "maxLength": 20 },
+        "vehicleType": { "type": "string", "enum": ["bike", "rickshaw", "mini", "ac-car", "premium"] },
+        "serviceType": { "type": "string", "enum": ["city", "long-route", "city-to-city", "tourism"] },
+        "createdAt": { "type": "integer" }
+      },
+      "required": ["id", "passengerId", "pickupLocation", "dropoffLocation", "status", "fare", "distance", "vehicleType", "serviceType", "createdAt"]
+    },
+    "groupConfig": {
+      "title": "Group Configuration",
+      "description": "Global or group-wide settings, broadcast status, notice, and aggregate active member statistics.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "membersCount": { "type": "integer" },
+        "driversCount": { "type": "integer" },
+        "passengersCount": { "type": "integer" },
+        "broadcastStatus": { "type": "string", "maxLength": 500 },
+        "broadcastDriverId": { "type": "string", "maxLength": 128 },
+        "broadcastDriverName": { "type": "string", "maxLength": 50 },
+        "broadcastDriverSelfie": { "type": "string", "maxLength": 300 },
+        "broadcastDriverVehicleType": { "type": "string", "maxLength": 50 },
+        "notice": { "type": "string", "maxLength": 500 },
+        "updatedAt": { "type": "integer" }
+      },
+      "required": ["id", "membersCount", "driversCount", "passengersCount", "broadcastStatus", "notice", "updatedAt"]
+    },
+    "credential": {
+      "title": "WebAuthn Credential",
+      "description": "Stores WebAuthn public key credential for biometric authentication.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "publicKey": { "type": "string" },
+        "counter": { "type": "integer" },
+        "deviceType": { "type": "string" },
+        "backedUp": { "type": "boolean" },
+        "transports": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["id", "userId", "publicKey", "counter", "deviceType", "backedUp"]
+    },
+    "call": {
+      "title": "Call",
+      "description": "Real-time call session state between passenger and driver.",
+      "type": "object",
+      "properties": {
+        "callId": { "type": "string", "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "from": { "type": "string", "maxLength": 128 },
+        "to": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["ringing", "connected", "ended"] },
+        "createdAt": { "type": "integer" }
+      },
+      "required": ["callId", "from", "to", "status"]
+    }
+  },
+  "firestore": {
+    "users": {
+      "schema": { "$ref": "#/entities/user" },
+      "description": "Public and private user profiles, authenticated by Firebase Auth."
+    },
+    "statuses": {
+      "schema": { "$ref": "#/entities/status" },
+      "description": "Broadcasted social and road conditions updates of drivers/passengers."
+    },
+    "rides": {
+      "schema": { "$ref": "#/entities/ride" },
+      "description": "Active and finished rides booked between passengers and approved drivers."
+    },
+    "groupSettings": {
+      "schema": { "$ref": "#/entities/groupConfig" },
+      "description": "A single configuration document coordinating group broadcasts and aggregate stats."
+    },
+    "credentials": {
+      "schema": { "$ref": "#/entities/credential" },
+      "description": "WebAuthn credentials for users."
+    },
+    "calls": {
+      "schema": { "$ref": "#/entities/call" },
+      "description": "Real-time voice calls established between passengers and drivers."
+    }
+  }
+}
